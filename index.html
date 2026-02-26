@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitnessPro - Daily Fitness Tracker & Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .tab-active {
+            border-b-2 border-blue-500;
+            color: #3b82f6;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        
+        input, textarea, select {
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.625rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 0.625rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .list-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+        }
+        
+        .list-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-info {
+            background-color: #dbeafe;
+            color: #0c4a6e;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            transition: width 0.3s ease;
+            border-radius: 9999px;
+        }
+
+        .program-card {
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .program-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .program-card.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .goal-checkbox {
+            cursor: pointer;
+        }
+
+        .exercise-card {
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .day-schedule {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .meal-card {
+            background: #f8fafb;
+            border-left: 4px solid #10b981;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="glass-effect border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">FitnessPro</h1>
+                        <p class="text-gray-600 text-sm mt-1">Complete Fitness Tracker & Program Planner</p>
+                    </div>
+                    <div class="text-right">
+                        <p id="todayDate" class="text-gray-600 text-sm font-medium"></p>
+                        <p id="dayOfWeek" class="text-gray-900 font-semibold"></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-box card-shadow">
+                    <div class="stat-label">Today's Workouts</div>
+                    <div class="stat-value" id="todayWorkoutCount">0</div>
+                    <div class="stat-label">minutes</div>
+                </div>
+                <div class="stat-box card-shadow">
+                    <div class="stat-label">Calories Consumed</div>
+                    <div class="stat-value" id="todayCalories">0</div>
+                    <div class="stat-label">kcal</div>
+                </div>
+                <div class="stat-box card-shadow">
+                    <div class="stat-label">Rest Hours</div>
+                    <div class="stat-value" id="todayRest">0</div>
+                    <div class="stat-label">hours</div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="glass-effect card-shadow border-b border-gray-200 mb-8 rounded-t-lg">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex gap-8 overflow-x-auto">
+                        <button class="tab-btn tab-active py-4 px-2 font-semibold transition-colors whitespace-nowrap" data-tab="setup">
+                            ⚙️ Setup Program
+                        </button>
+                        <button class="tab-btn py-4 px-2 font-semibold transition-colors whitespace-nowrap" data-tab="program">
+                            📅 Weekly Program
+                        </button>
+                        <button class="tab-btn py-4 px-2 font-semibold transition-colors whitespace-nowrap" data-tab="diet">
+                            🍛 Diet Plan
+                        </button>
+                        <button class="tab-btn py-4 px-2 font-semibold transition-colors whitespace-nowrap" data-tab="tracker">
+                            📊 Daily Tracker
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="glass-effect card-shadow rounded-b-lg p-6">
+                <!-- Setup Program Tab -->
+                <div id="setup-tab" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Choose Your Workout Program</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="program-card" onclick="selectProgram('brosplit')">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">💪 Bro Split</h3>
+                                <p class="text-sm text-gray-600">Chest • Back • Shoulders • Arms • Legs</p>
+                                <p class="text-xs text-gray-500 mt-2">5 days/week • Best for: Muscle growth</p>
+                            </div>
+                            <div class="program-card" onclick="selectProgram('ppl')">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">🔄 Push Pull Legs</h3>
+                                <p class="text-sm text-gray-600">Push • Pull • Legs (x2)</p>
+                                <p class="text-xs text-gray-500 mt-2">6 days/week • Best for: Balanced growth</p>
+                            </div>
+                            <div class="program-card" onclick="selectProgram('fullbody')">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">🏋️ Full Body</h3>
+                                <p class="text-sm text-gray-600">All muscles every session</p>
+                                <p class="text-xs text-gray-500 mt-2">3-4 days/week • Best for: Beginners</p>
+                            </div>
+                        </div>
+
+                        <div id="goalSection" style="display: none;">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Select Your Goals</h3>
+                            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="goalGainMuscle" onchange="updateGoals()">
+                                        <label for="goalGainMuscle" class="text-gray-700">Gain Muscle</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="goalLoseFat" onchange="updateGoals()">
+                                        <label for="goalLoseFat" class="text-gray-700">Lose Fat</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="goalEndurance" onchange="updateGoals()">
+                                        <label for="goalEndurance" class="text-gray-700">Build Endurance</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="goalAgility" onchange="updateGoals()">
+                                        <label for="goalAgility" class="text-gray-700">Improve Agility</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary" onclick="generateProgram()">Generate My Program</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Program Tab -->
+                <div id="program-tab" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Your Weekly Program</h2>
+                    <div id="programContent">
+                        <p class="text-center text-gray-500 py-8">Select a program and goals to generate your custom plan</p>
+                    </div>
+                </div>
+
+                <!-- Diet Plan Tab -->
+                <div id="diet-tab" class="tab-content hidden">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Indian Diet Plan</h2>
+                    <div id="dietContent">
+                        <p class="text-center text-gray-500 py-8">Generate a program first to see your personalized diet plan</p>
+                    </div>
+                </div>
+
+                <!-- Daily Tracker Tab -->
+                <div id="tracker-tab" class="tab-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Today's Workouts</h2>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg mb-6 border border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Add New Workout</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Exercise Type</label>
+                                    <input type="text" id="workoutType" placeholder="e.g., Running, Weight Lifting, Yoga" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                                    <input type="number" id="workoutDuration" placeholder="30" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Intensity</label>
+                                    <select id="workoutIntensity" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="">Select intensity</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Moderate">Moderate</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Calories Burned</label>
+                                    <input type="number" id="workoutCalories" placeholder="150" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                            <button class="btn-primary" id="addWorkoutBtn">Add Workout</button>
+                        </div>
+
+                        <!-- Workouts List -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div id="workoutsList" class="divide-y divide-gray-200">
+                                <div class="p-6 text-center text-gray-500">
+                                    No workouts logged yet. Start by adding your first workout!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 mt-8">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Today's Diet</h2>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg mb-6 border border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Log Food Item</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Food Item</label>
+                                    <input type="text" id="foodItem" placeholder="e.g., Chicken Breast, Apple, Brown Rice" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Calories (kcal)</label>
+                                    <input type="number" id="foodCalories" placeholder="150" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Protein (g)</label>
+                                    <input type="number" id="foodProtein" placeholder="25" min="0" step="0.1" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Meal Type</label>
+                                    <select id="mealType" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="">Select meal type</option>
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="Lunch">Lunch</option>
+                                        <option value="Dinner">Dinner</option>
+                                        <option value="Snack">Snack</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn-primary" id="addFoodBtn">Log Food</button>
+                        </div>
+
+                        <!-- Macros Summary -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-2">Total Calories</div>
+                                <div class="text-3xl font-bold text-blue-600" id="totalMacroCalories">0</div>
+                                <div class="text-xs text-gray-500 mt-1">kcal</div>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-2">Total Protein</div>
+                                <div class="text-3xl font-bold text-blue-600" id="totalMacroProtein">0</div>
+                                <div class="text-xs text-gray-500 mt-1">grams</div>
+                            </div>
+                            <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-2">Meals Logged</div>
+                                <div class="text-3xl font-bold text-blue-600" id="totalMeals">0</div>
+                                <div class="text-xs text-gray-500 mt-1">items</div>
+                            </div>
+                        </div>
+
+                        <!-- Diet List -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div id="dietList" class="divide-y divide-gray-200">
+                                <div class="p-6 text-center text-gray-500">
+                                    No food items logged yet. Start tracking your diet!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <button class="btn-secondary" id="clearDataBtn">Clear All Data</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Fitness App with Program Generator
+        const APP_DATA_KEY = 'fitnessPro_data';
+        const PROGRAM_DATA_KEY = 'fitnessPro_program';
+        const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        // Workout Programs Database
+        const workoutPrograms = {
+            brosplit: {
+                name: 'Bro Split',
+                days: 5,
+                structure: ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs']
+            },
+            ppl: {
+                name: 'Push Pull Legs',
+                days: 6,
+                structure: ['Push', 'Pull', 'Legs', 'Push', 'Pull', 'Legs']
+            },
+            fullbody: {
+                name: 'Full Body',
+                days: 3,
+                structure: ['Full Body', 'Full Body', 'Full Body']
+            }
+        };
+
+        // Exercise Database
+        const exerciseDatabase = {
+            'Chest': {
+                gainMuscle: ['Barbell Bench Press (4x5)', 'Incline Dumbbell Press (3x8)', 'Cable Flyes (3x12)', 'Dips (3x8)'],
+                loseFat: ['Incline Walking Treadmill (15 min)', 'Chest Press Machine (3x12)', 'Push-ups (3x15)', 'Cable Crossovers (3x12)'],
+                endurance: ['Push-ups (3x20)', 'Machine Chest Press (3x15)', 'Incline Running (10 min)', 'Resistance Band Chest Press (3x20)'],
+                agility: ['Medicine Ball Chest Passes (3x12)', 'Plyometric Push-ups (3x10)', 'Boxing (5 min)', 'Explosive Push-ups (3x8)']
+            },
+            'Back': {
+                gainMuscle: ['Barbell Deadlifts (4x5)', 'Barbell Rows (4x6)', 'Weighted Pull-ups (4x6)', 'Barbell Shrugs (3x8)'],
+                loseFat: ['Rowing Machine (15 min)', 'Lat Pulldown (3x12)', 'Assisted Pull-ups (3x10)', 'Resistance Band Rows (3x15)'],
+                endurance: ['Rowing Machine (20 min)', 'Lat Pulldown (3x15)', 'Pull-ups (3x12)', 'Machine Rows (3x15)'],
+                agility: ['Battle Ropes (3x30s)', 'Medicine Ball Slams (3x12)', 'Lateral Rows (3x12)', 'Speed Bag (5 min)']
+            },
+            'Shoulders': {
+                gainMuscle: ['Overhead Press (4x6)', 'Lateral Raises (4x8)', 'Reverse Flyes (3x10)', 'Shrugs (3x8)'],
+                loseFat: ['Shoulder Press Machine (3x12)', 'Lateral Raises (3x15)', 'Upright Rows (3x12)', 'Swimming (10 min)'],
+                endurance: ['Machine Shoulder Press (3x15)', 'Pike Push-ups (3x12)', 'Standing Lateral Raises (3x20)', 'Resistance Band Press (3x20)'],
+                agility: ['Medicine Ball Throws (3x10)', 'Dumbbell Snatches (3x10)', 'Push Press (3x8)', 'Rotational Throws (3x10)']
+            },
+            'Arms': {
+                gainMuscle: ['Barbell Curls (4x6)', 'Close Grip Bench Press (4x6)', 'Dumbbell Curls (3x8)', 'Tricep Dips (3x8)'],
+                loseFat: ['Dumbbell Curls (3x12)', 'Tricep Pushdowns (3x15)', 'Hammer Curls (3x12)', 'Rope Curls (3x12)'],
+                endurance: ['Dumbbell Curls (3x20)', 'Tricep Extensions (3x15)', 'Resistance Band Curls (3x20)', 'Dips (3x15)'],
+                agility: ['Speed Ball Practice (3x30s)', 'Heavy Bag Punching (3 min)', 'Explosive Dumbbell Curls (3x10)', 'Speed Rope (3x2 min)']
+            },
+            'Legs': {
+                gainMuscle: ['Barbell Squats (4x5)', 'Deadlifts (3x5)', 'Bulgarian Split Squats (3x8)', 'Leg Press (3x8)'],
+                loseFat: ['Incline Treadmill Walk (15 min)', 'Leg Press (3x12)', 'Leg Curls (3x12)', 'Jump Squats (3x12)'],
+                endurance: ['Treadmill Running (20 min)', 'Stationary Bike (20 min)', 'Leg Press (3x15)', 'Leg Extensions (3x15)'],
+                agility: ['Box Jumps (3x8)', 'Lateral Lunges (3x12)', 'Jump Squats (3x12)', 'Single Leg Hops (3x10)']
+            },
+            'Push': {
+                gainMuscle: ['Barbell Bench Press (4x5)', 'Incline Dumbbell Press (3x8)', 'Overhead Press (3x6)', 'Dips (3x8)'],
+                loseFat: ['Chest Press Machine (3x12)', 'Incline Treadmill (10 min)', 'Shoulder Press (3x12)', 'Push-ups (3x15)'],
+                endurance: ['Push-ups (3x20)', 'Machine Chest Press (3x15)', 'Resistance Band Press (3x20)', 'Dips (3x15)'],
+                agility: ['Plyometric Push-ups (3x10)', 'Medicine Ball Chest Passes (3x12)', 'Explosive Push Press (3x8)', 'Boxing Combos (5 min)']
+            },
+            'Pull': {
+                gainMuscle: ['Barbell Deadlifts (4x5)', 'Weighted Pull-ups (4x6)', 'Barbell Rows (3x6)', 'Face Pulls (3x10)'],
+                loseFat: ['Rowing Machine (15 min)', 'Lat Pulldown (3x12)', 'Pull-ups (3x10)', 'Assisted Rows (3x12)'],
+                endurance: ['Rowing Machine (20 min)', 'Pull-ups (3x12)', 'Machine Rows (3x15)', 'Lat Pulldowns (3x15)'],
+                agility: ['Battle Ropes (3x30s)', 'Medicine Ball Slams (3x12)', 'Jump Pull-ups (3x8)', 'Heavy Bag Work (5 min)']
+            },
+            'Full Body': {
+                gainMuscle: ['Barbell Squats (3x5)', 'Bench Press (3x5)', 'Barbell Rows (3x5)', 'Overhead Press (3x5)'],
+                loseFat: ['Treadmill (10 min)', 'Kettlebell Swings (3x12)', 'Burpees (3x10)', 'Jump Squats (3x12)'],
+                endurance: ['Rowing Machine (15 min)', 'Circuit Training (20 min)', 'Swimming (15 min)', 'Cycling (15 min)'],
+                agility: ['Jump Rope (3x2 min)', 'Box Jumps (3x8)', 'Lateral Bounds (3x10)', 'Agility Ladder (3 sets)']
+            }
+        };
+
+        // Indian Diet Database
+        const indianDietPlan = {
+            gainMuscle: {
+                Breakfast: [
+                    { name: 'Masala Oats with Milk', calories: 350, protein: 15 },
+                    { name: 'Paneer Paratha with Yogurt', calories: 400, protein: 18 },
+                    { name: 'Chickpea Curry with Roti', calories: 380, protein: 14 }
+                ],
+                Lunch: [
+                    { name: 'Grilled Chicken with Basmati Rice', calories: 550, protein: 40 },
+                    { name: 'Fish Curry with Brown Rice', calories: 520, protein: 38 },
+                    { name: 'Paneer Tikka with Rotli and Dal', calories: 480, protein: 35 }
+                ],
+                Dinner: [
+                    { name: 'Lean Mutton Curry with Roti', calories: 500, protein: 38 },
+                    { name: 'Tandoori Chicken with Vegetables', calories: 420, protein: 40 },
+                    { name: 'Moong Dal Khichdi with Ghee', calories: 380, protein: 12 }
+                ],
+                Snack: [
+                    { name: 'Greek Yogurt with Granola', calories: 200, protein: 15 },
+                    { name: 'Protein Shake with Banana', calories: 250, protein: 25 },
+                    { name: 'Roasted Chickpeas', calories: 180, protein: 12 }
+                ]
+            },
+            loseFat: {
+                Breakfast: [
+                    { name: 'Egg White Omelet with Vegetables', calories: 150, protein: 20 },
+                    { name: 'Upma (Semolina with Vegetables)', calories: 180, protein: 8 },
+                    { name: 'Green Tea with Chikhalwali Toast', calories: 120, protein: 4 }
+                ],
+                Lunch: [
+                    { name: 'Grilled Chicken Salad with Lemon', calories: 280, protein: 35 },
+                    { name: 'Moong Sprout Salad', calories: 150, protein: 10 },
+                    { name: 'Grilled Fish with Steamed Vegetables', calories: 320, protein: 38 }
+                ],
+                Dinner: [
+                    { name: 'Tandoori Chicken with Cucumber Salad', calories: 300, protein: 38 },
+                    { name: 'Dal Tadka with Roti (1 piece)', calories: 220, protein: 12 },
+                    { name: 'Vegetable Stir Fry with Brown Rice', calories: 280, protein: 10 }
+                ],
+                Snack: [
+                    { name: 'Roasted Makhana', calories: 100, protein: 3 },
+                    { name: 'Mixed Vegetable Juice', calories: 80, protein: 2 },
+                    { name: 'Almonds (handful)', calories: 150, protein: 5 }
+                ]
+            },
+            endurance: {
+                Breakfast: [
+                    { name: 'Poha with Sprouts', calories: 280, protein: 10 },
+                    { name: 'Wheat Dosa with Sambar', calories: 320, protein: 12 },
+                    { name: 'Millet Upma with Vegetables', calories: 300, protein: 10 }
+                ],
+                Lunch: [
+                    { name: 'Whole Wheat Roti with Lentil Curry', calories: 450, protein: 20 },
+                    { name: 'Basmati Rice with Mixed Vegetable Curry', calories: 420, protein: 15 },
+                    { name: 'Barley Khichdi with Vegetables', calories: 380, protein: 14 }
+                ],
+                Dinner: [
+                    { name: 'Wheat Roti with Spinach Dal', calories: 380, protein: 16 },
+                    { name: 'Brown Rice with Chickpea Curry', calories: 400, protein: 18 },
+                    { name: 'Millets with Mixed Vegetables', calories: 350, protein: 12 }
+                ],
+                Snack: [
+                    { name: 'Banana with Peanut Butter', calories: 200, protein: 8 },
+                    { name: 'Mixed Fruit Smoothie', calories: 220, protein: 6 },
+                    { name: 'Dates and Almonds', calories: 180, protein: 5 }
+                ]
+            },
+            agility: {
+                Breakfast: [
+                    { name: 'Egg White Scramble with Toast', calories: 200, protein: 18 },
+                    { name: 'Idli with Coconut Chutney', calories: 220, protein: 8 },
+                    { name: 'Buckwheat Pancakes', calories: 250, protein: 10 }
+                ],
+                Lunch: [
+                    { name: 'Grilled Chicken with Vegetable Stir Fry', calories: 380, protein: 40 },
+                    { name: 'Fish Curry (light) with Rice', calories: 360, protein: 32 },
+                    { name: 'Chickpea Salad with Lemon Dressing', calories: 300, protein: 16 }
+                ],
+                Dinner: [
+                    { name: 'Tandoori Paneer with Vegetable Skewers', calories: 320, protein: 28 },
+                    { name: 'Lean Meat with Brown Rice', calories: 400, protein: 38 },
+                    { name: 'Vegetable Ratatouille with Roti', calories: 280, protein: 12 }
+                ],
+                Snack: [
+                    { name: 'Protein Bar (homemade)', calories: 180, protein: 15 },
+                    { name: 'Trail Mix with Nuts', calories: 200, protein: 8 },
+                    { name: 'Coconut Water with Lemon', calories: 100, protein: 2 }
+                ]
+            }
+        };
+
+        class FitnessApp {
+            constructor() {
+                this.data = this.loadData();
+                this.program = this.loadProgram();
+                this.init();
+            }
+
+            init() {
+                this.setupDate();
+                this.attachEventListeners();
+                this.renderAllData();
+            }
+
+            loadData() {
+                const stored = localStorage.getItem(APP_DATA_KEY);
+                return stored ? JSON.parse(stored) : { workouts: [], diet: [], rest: [] };
+            }
+
+            loadProgram() {
+                const stored = localStorage.getItem(PROGRAM_DATA_KEY);
+                return stored ? JSON.parse(stored) : null;
+            }
+
+            saveData() {
+                localStorage.setItem(APP_DATA_KEY, JSON.stringify(this.data));
+                this.renderAllData();
+            }
+
+            saveProgram() {
+                localStorage.setItem(PROGRAM_DATA_KEY, JSON.stringify(this.program));
+            }
+
+            setupDate() {
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                const dayName = DAYS_OF_WEEK[today.getDay()];
+
+                document.getElementById('todayDate').textContent = formattedDate;
+                document.getElementById('dayOfWeek').textContent = dayName;
+            }
+
+            attachEventListeners() {
+                // Tab switching
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+                });
+
+                // Workout
+                document.getElementById('addWorkoutBtn').addEventListener('click', () => this.addWorkout());
+                // Diet
+                document.getElementById('addFoodBtn').addEventListener('click', () => this.addFood());
+                // Clear data
+                document.getElementById('clearDataBtn').addEventListener('click', () => this.clearAllData());
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('tab-active');
+                });
+
+                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('tab-active');
+
+                if (tabName === 'program' && this.program) {
+                    this.displayProgram();
+                }
+                if (tabName === 'diet' && this.program) {
+                    this.displayDietPlan();
+                }
+            }
+
+            addWorkout() {
+                const type = document.getElementById('workoutType').value.trim();
+                const duration = parseInt(document.getElementById('workoutDuration').value);
+                const intensity = document.getElementById('workoutIntensity').value;
+                const calories = parseInt(document.getElementById('workoutCalories').value) || 0;
+
+                if (!type || !duration || !intensity) {
+                    alert('Please fill in all workout fields');
+                    return;
+                }
+
+                const workout = {
+                    id: Date.now(),
+                    type, duration, intensity, calories,
+                    date: new Date().toDateString(),
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                this.data.workouts.push(workout);
+                this.saveData();
+
+                document.getElementById('workoutType').value = '';
+                document.getElementById('workoutDuration').value = '';
+                document.getElementById('workoutIntensity').value = '';
+                document.getElementById('workoutCalories').value = '';
+            }
+
+            addFood() {
+                const item = document.getElementById('foodItem').value.trim();
+                const calories = parseInt(document.getElementById('foodCalories').value);
+                const protein = parseFloat(document.getElementById('foodProtein').value) || 0;
+                const mealType = document.getElementById('mealType').value;
+
+                if (!item || !calories || !mealType) {
+                    alert('Please fill in all diet fields');
+                    return;
+                }
+
+                const food = {
+                    id: Date.now(),
+                    item, calories, protein, mealType,
+                    date: new Date().toDateString(),
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                this.data.diet.push(food);
+                this.saveData();
+
+                document.getElementById('foodItem').value = '';
+                document.getElementById('foodCalories').value = '';
+                document.getElementById('foodProtein').value = '';
+                document.getElementById('mealType').value = '';
+            }
+
+            deleteFood(id) {
+                this.data.diet = this.data.diet.filter(d => d.id !== id);
+                this.saveData();
+            }
+
+            deleteWorkout(id) {
+                this.data.workouts = this.data.workouts.filter(w => w.id !== id);
+                this.saveData();
+            }
+
+            getTodayWorkouts() {
+                const today = new Date().toDateString();
+                return this.data.workouts.filter(w => w.date === today);
+            }
+
+            getTodayDiet() {
+                const today = new Date().toDateString();
+                return this.data.diet.filter(d => d.date === today);
+            }
+
+            renderAllData() {
+                this.renderWorkouts();
+                this.renderDiet();
+                this.updateQuickStats();
+            }
+
+            renderWorkouts() {
+                const todayWorkouts = this.getTodayWorkouts();
+                const container = document.getElementById('workoutsList');
+
+                if (todayWorkouts.length === 0) {
+                    container.innerHTML = '<div class="p-6 text-center text-gray-500">No workouts logged yet</div>';
+                    return;
+                }
+
+                container.innerHTML = todayWorkouts.map(w => `
+                    <div class="list-item">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${w.type}</h4>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <span class="badge badge-info">${w.duration} min</span>
+                                    <span class="badge badge-success ml-2">${w.intensity}</span>
+                                    <span class="badge badge-warning ml-2">${w.calories} cal</span>
+                                </p>
+                            </div>
+                            <button onclick="app.deleteWorkout(${w.id})" class="text-red-500 hover:text-red-700 text-sm font-medium">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderDiet() {
+                const todayDiet = this.getTodayDiet();
+                const container = document.getElementById('dietList');
+
+                if (todayDiet.length === 0) {
+                    container.innerHTML = '<div class="p-6 text-center text-gray-500">No food items logged yet</div>';
+                    return;
+                }
+
+                container.innerHTML = todayDiet.map(d => `
+                    <div class="list-item">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${d.item}</h4>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <span class="badge badge-info">${d.calories} kcal</span>
+                                    <span class="badge badge-success ml-2">${d.protein}g protein</span>
+                                    <span class="badge badge-warning ml-2">${d.mealType}</span>
+                                </p>
+                            </div>
+                            <button onclick="app.deleteFood(${d.id})" class="text-red-500 hover:text-red-700 text-sm font-medium">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateQuickStats() {
+                const todayWorkouts = this.getTodayWorkouts();
+                const todayDiet = this.getTodayDiet();
+
+                const totalWorkoutMinutes = todayWorkouts.reduce((sum, w) => sum + w.duration, 0);
+                const totalCalories = todayDiet.reduce((sum, d) => sum + d.calories, 0);
+
+                document.getElementById('todayWorkoutCount').textContent = totalWorkoutMinutes;
+                document.getElementById('todayCalories').textContent = totalCalories;
+                document.getElementById('todayRest').textContent = '0';
+
+                const totalProtein = todayDiet.reduce((sum, d) => sum + d.protein, 0);
+                const totalMeals = todayDiet.length;
+
+                document.getElementById('totalMacroCalories').textContent = totalCalories;
+                document.getElementById('totalMacroProtein').textContent = totalProtein.toFixed(1);
+                document.getElementById('totalMeals').textContent = totalMeals;
+            }
+
+            displayProgram() {
+                if (!this.program) return;
+
+                const programData = workoutPrograms[this.program.type];
+                const goals = this.program.goals;
+                let html = `<h3 class="text-xl font-bold text-gray-900 mb-4">Your ${programData.name} Program</h3>`;
+
+                programData.structure.forEach((day, index) => {
+                    const exercises = exerciseDatabase[day];
+                    let selectedExercises = [];
+
+                    goals.forEach(goal => {
+                        if (exercises[goal]) {
+                            selectedExercises = [...selectedExercises, ...exercises[goal]];
+                        }
+                    });
+
+                    html += `
+                        <div class="day-schedule">
+                            <h4 class="text-lg font-bold text-gray-900 mb-3">Day ${index + 1}: ${day}</h4>
+                            <div class="ml-2">
+                                ${selectedExercises.slice(0, 4).map((exercise, i) => `
+                                    <div class="exercise-card">
+                                        <div class="flex justify-between">
+                                            <span class="font-semibold text-gray-900">${exercise}</span>
+                                            <span class="text-xs text-gray-500">Exercise ${i + 1}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('programContent').innerHTML = html;
+            }
+
+            displayDietPlan() {
+                if (!this.program) return;
+
+                const primaryGoal = this.program.goals[0];
+                const dietData = indianDietPlan[primaryGoal];
+                let html = `<h3 class="text-xl font-bold text-gray-900 mb-4">Your Personalized Indian Diet Plan</h3>`;
+                html += `<p class="text-gray-600 mb-6">Based on: <strong>${primaryGoal.toUpperCase()}</strong></p>`;
+
+                ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(mealType => {
+                    html += `
+                        <div class="mb-8">
+                            <h4 class="text-lg font-bold text-gray-900 mb-3">${mealType}</h4>
+                            <div>
+                                ${dietData[mealType].map(meal => `
+                                    <div class="meal-card">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h5 class="font-semibold text-gray-900">${meal.name}</h5>
+                                                <p class="text-sm text-gray-600 mt-1">
+                                                    <span class="badge badge-info">${meal.calories} kcal</span>
+                                                    <span class="badge badge-success ml-2">${meal.protein}g protein</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('dietContent').innerHTML = html;
+            }
+
+            clearAllData() {
+                if (confirm('Clear all data?')) {
+                    this.data = { workouts: [], diet: [], rest: [] };
+                    this.saveData();
+                }
+            }
+        }
+
+        // Global functions
+        function selectProgram(programType) {
+            document.querySelectorAll('.program-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.program-card').classList.add('selected');
+            document.getElementById('goalSection').style.display = 'block';
+            window.selectedProgram = programType;
+        }
+
+        function updateGoals() {
+            // Goals checkbox handler
+        }
+
+        function generateProgram() {
+            const goals = [];
+            if (document.getElementById('goalGainMuscle').checked) goals.push('gainMuscle');
+            if (document.getElementById('goalLoseFat').checked) goals.push('loseFat');
+            if (document.getElementById('goalEndurance').checked) goals.push('endurance');
+            if (document.getElementById('goalAgility').checked) goals.push('agility');
+
+            if (goals.length === 0) {
+                alert('Please select at least one goal');
+                return;
+            }
+
+            app.program = {
+                type: window.selectedProgram,
+                goals: goals,
+                createdAt: new Date().toDateString()
+            };
+
+            app.saveProgram();
+            alert('Program generated! Check your Weekly Program and Diet Plan tabs.');
+            app.switchTab('program');
+        }
+
+        const app = new FitnessApp();
+    </script>
+</body>
+</html>
